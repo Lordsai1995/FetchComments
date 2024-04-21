@@ -22,14 +22,13 @@ class CommentAdapter : RecyclerView.Adapter<CommentAdapter.CommentViewHolder>() 
         }
     }
     private val differ = AsyncListDiffer(this, diffCallback)
-    var comment: List<Comment>
+    var comments: List<Comment>
         get() = differ.currentList
         set(value) {
             differ.submitList(value)
         }
 
-    override fun getItemCount() = comment.size
-
+    override fun getItemCount() = comments.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CommentViewHolder {
         return CommentViewHolder(
@@ -43,13 +42,12 @@ class CommentAdapter : RecyclerView.Adapter<CommentAdapter.CommentViewHolder>() 
 
     override fun onBindViewHolder(holder: CommentViewHolder, position: Int) {
         holder.binding.apply {
-            val comment = comment[position]
+            val comment = comments[position]
             tvBody.text = comment.body
-            tvEmail.text=comment.email
+            tvEmail.text = comment.email
         }
     }
 }
-
 
 
 

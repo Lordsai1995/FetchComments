@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myapplicationretrofot2.RetrofitInstance
 import com.example.myapplicationretrofot2.databinding.ActivityMainBinding
 import com.example.myapplicationretrofot2.CommentAdapter
+import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -21,32 +22,31 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        setupRecyclerView()
+        commentAdapter = CommentAdapter()
 
-        lifecycleScope.launchWhenCreated {
+        lifecycleScope.launch {
             binding.progressbar.isVisible = true
             val response = try {
                 RetrofitInstance().api.getComments()
             } catch (e: IOException) {
                 Log.e(TAG, "IOException,you might not have internet connection")
-                return@launchWhenCreated
+                return@launch
             } catch (e: HttpException) {
                 Log.e(TAG, "HttpException,unexpected response")
                 binding.progressbar.isVisible = false
-                return@launchWhenCreated
+                return@launch
             }
             if (response.isSuccessful && response.body() != null) {
-                commentAdapter.comment = response.body()!!
+                binding.rvComment.apply {
+                    adapter = commentAdapter
+                    layoutManager = LinearLayoutManager(this@MainActivity)
+                }
+                commentAdapter.comments = response.body()!!
             } else {
                 Log.e(TAG, " response not successful")
             }
             binding.progressbar.isVisible = false
         }
 
-    }
-
-    private fun setupRecyclerView() = binding.rvComment.apply {
-        adapter = CommentAdapter()
-        layoutManager = LinearLayoutManager(this@MainActivity)
     }
 }
